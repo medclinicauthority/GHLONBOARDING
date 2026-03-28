@@ -1,0 +1,275 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Client Onboarding — Med Clinic Authority</title>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400&family=Outfit:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+    body{background:#ede4d4;font-family:'Outfit',sans-serif;min-height:100vh}
+    ::-webkit-scrollbar{width:4px}::-webkit-scrollbar-thumb{background:#ede9e1;border-radius:4px}
+    .fade{animation:fadeUp .4s cubic-bezier(.4,0,.2,1) both}
+    @keyframes fadeUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:none}}
+    .btn-gold{background:linear-gradient(135deg,#c9a96e,#b8924a);color:#fff;border:none;border-radius:10px;padding:14px 28px;font-size:15px;font-weight:500;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+    .btn-gold:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(201,169,110,.35)}
+    .btn-gold:disabled{opacity:.4;cursor:not-allowed;transform:none;box-shadow:none}
+    .btn-ghost{background:transparent;color:#8888aa;border:1.5px solid #ede9e1;border-radius:10px;padding:14px 20px;font-size:14px;font-family:'Outfit',sans-serif;cursor:pointer;transition:all .2s}
+    .btn-ghost:hover{border-color:#c9a96e;color:#1a1a2e}
+    .fi{width:100%;padding:12px 14px;border-radius:8px;border:1.5px solid #ede9e1;background:#ede4d4;color:#1a1a2e;font-size:14px;font-family:'Outfit',sans-serif;outline:none;transition:border-color .2s}
+    .fi:focus{border-color:#c9a96e;background:#fff}
+    textarea.fi{resize:vertical;line-height:1.6}
+    .chip{padding:7px 14px;border-radius:20px;border:1.5px solid #ede9e1;background:#ede4d4;color:#666680;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;white-space:nowrap}
+    .chip.on{border-color:#c9a96e;background:#fdf6ec;color:#1a1a2e;font-weight:500}
+    .opt{padding:11px 14px;border-radius:8px;border:1.5px solid #ede9e1;background:#ede4d4;color:#666680;font-size:13px;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;text-align:left;width:100%}
+    .opt.on{border-color:#c9a96e;background:#fdf6ec;color:#1a1a2e;font-weight:500}
+    .timebtn{padding:10px 8px;border-radius:8px;border:1.5px solid #ede9e1;background:#ede4d4;color:#666680;font-size:12px;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .15s;text-align:center;width:100%}
+    .timebtn.on{border-color:#c9a96e;background:#fdf6ec;color:#1a1a2e;font-weight:500}
+    .typecard{padding:16px 12px;border-radius:12px;border:1.5px solid #ede9e1;background:#ede4d4;cursor:pointer;font-family:'Outfit',sans-serif;transition:all .2s;text-align:center}
+    .typecard.on{border-color:#c9a96e;background:#fdf6ec}
+    em{font-style:italic;color:#c9a96e}
+    @keyframes pop{from{opacity:0;transform:scale(.4) rotate(-20deg)}to{opacity:1;transform:scale(1) rotate(0)}}
+    .pop{animation:pop .6s cubic-bezier(.34,1.56,.64,1) both}
+    @media(max-width:600px){.card{padding:26px 18px !important}.g2,.g3{grid-template-columns:1fr !important}}
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState} = React;
+const GHL_TOKEN = new URLSearchParams(window.location.search).get('token')||'';
+const LOGO = "data:image/png;base64,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";
+
+const SPA_SVCS=["Botox / Neurotoxins","Dermal Fillers","Laser Treatments","Body Contouring","IV Therapy","Skin Care / Facials","Weight Loss Programs","PRP Treatments","Microneedling","Chemical Peels","Hormone Therapy","Other"];
+const CLINIC_SVCS=["Weight Loss / GLP-1 (Ozempic, Semaglutide)","Hormone Replacement (HRT)","Hair Loss Treatment","Supplement Programs","Lab Testing / Blood Work","Meal Plans Shipped to Clients","Men's Health","Women's Health","Anti-Aging / Longevity","Mental Health / Therapy","Primary / Urgent Care","Other"];
+const AD_SPEND=["Not currently running ads","$500–$1,500/mo","$1,500–$3,000/mo","$3,000–$5,000/mo","$5,000–$10,000/mo","$10,000+/mo"];
+const COLORS_LIST=["White & Gold","Black & Gold","Navy & White","Rose Gold & Cream","Sage Green & White","Blush Pink & Nude","Deep Burgundy & Ivory","Teal & Silver","Custom (describe below)"];
+const FONTS_LIST=["Clean & Modern (sans-serif)","Elegant & Serif","Script / Handwritten","Bold & Strong","Minimalist","Luxury / High-end","Let you decide"];
+const TIMES=["Mon 9–11am","Mon 2–4pm","Tue 9–11am","Tue 2–4pm","Wed 9–11am","Wed 2–4pm","Thu 9–11am","Thu 2–4pm","Fri 9–11am"];
+const US_STATES=["AL","AK","AZ","AR","CA","CO","CT","DE","FL","GA","HI","ID","IL","IN","IA","KS","KY","LA","ME","MD","MA","MI","MN","MS","MO","MT","NE","NV","NH","NJ","NM","NY","NC","ND","OH","OK","OR","PA","RI","SC","SD","TN","TX","UT","VT","VA","WA","WV","WI","WY"];
+
+async function submitGHL(f){
+  if(!GHL_TOKEN)return;
+  try{
+    const r=await fetch('https://services.leadconnectorhq.com/contacts/',{method:'POST',headers:{'Authorization':`Bearer ${GHL_TOKEN}`,'Content-Type':'application/json','Version':'2021-07-28'},body:JSON.stringify({firstName:f.first,lastName:f.last,email:f.email,phone:f.phone,companyName:f.bizName,city:f.city,state:f.state,tags:['new-client',f.type==='med-spa'?'med-spa':'online-clinic','onboarding'],source:'Onboarding Form'})});
+    const d=await r.json();
+    if(d?.contact?.id)await fetch(`https://services.leadconnectorhq.com/contacts/${d.contact.id}/tags`,{method:'POST',headers:{'Authorization':`Bearer ${GHL_TOKEN}`,'Content-Type':'application/json','Version':'2021-07-28'},body:JSON.stringify({tags:['send-welcome-sequence']})});
+  }catch(e){}
+}
+
+const LBL=({t})=><div style={{fontSize:11,fontWeight:600,color:'#8888aa',letterSpacing:.8,textTransform:'uppercase',marginBottom:8}}>{t}</div>;
+const F=({label,value,onChange,placeholder,type='text'})=>(<div style={{marginBottom:16}}><LBL t={label}/><input type={type} value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} className="fi"/></div>);
+const TA=({label,value,onChange,placeholder})=>(<div style={{marginBottom:16}}><LBL t={label}/><textarea value={value} onChange={e=>onChange(e.target.value)} placeholder={placeholder} rows={3} className="fi"/></div>);
+const SH=({icon,title,sub})=>(<div style={{marginBottom:22}}><div style={{fontSize:20,color:'#c9a96e',marginBottom:7}}>{icon}</div><h2 style={{fontFamily:"'Cormorant Garamond',serif",fontSize:25,fontWeight:500,color:'#1a1a2e',marginBottom:4}}>{title}</h2><p style={{fontSize:13,color:'#8888aa'}}>{sub}</p></div>);
+const Chips=({items,val,tog})=>(<div style={{display:'flex',flexWrap:'wrap',gap:8}}>{items.map(s=><button key={s} className={`chip ${val.includes(s)?'on':''}`} onClick={()=>tog(s)}>{s}</button>)}</div>);
+const Opts=({items,val,set,cols=2})=>(<div style={{display:'grid',gridTemplateColumns:`repeat(${cols},1fr)`,gap:8}}>{items.map(o=><button key={o} className={`opt ${val===o?'on':''}`} onClick={()=>set(o)}>{o}</button>)}</div>);
+const Nav=({onNext,onPrev,canNext})=>(<div style={{display:'flex',gap:12,marginTop:22}}><button className="btn-ghost" onClick={onPrev}>← Back</button><button className="btn-gold" style={{flex:1}} onClick={onNext} disabled={!canNext}>Continue →</button></div>);
+
+function App(){
+  const [step,setStep]=useState(0);
+  const [sub,setSub]=useState(false);
+  const [form,setForm]=useState({
+    type:'med-spa',bizName:'',partner:'',registered:'',state:'',city:'',zip:'',address:'',hours:'',
+    first:'',last:'',email:'',phone:'',website:'',instagram:'',facebook:'',tiktok:'',
+    services:[],licensedStates:[],platform:'',payModel:'',
+    colors:[],colorCustom:'',fonts:[],tagline:'',logoIdeas:'',brandEmotion:'',
+    adSpend:'',currentAgency:'',targetCustomers:'',goals:'',
+    routing:'',account:'',smsConsent:false,mktConsent:false,
+    callTime:'',notes:''
+  });
+  const set=(k,v)=>setForm(f=>({...f,[k]:v}));
+  const tog=(k,v)=>set(k,form[k].includes(v)?form[k].filter(x=>x!==v):[...form[k],v]);
+  const isCl=form.type==='online-clinic';
+  const go=()=>{setStep(s=>s+1);window.scrollTo(0,0);};
+  const back=()=>{setStep(s=>s-1);window.scrollTo(0,0);};
+  const submit=async()=>{setSub(true);await submitGHL(form);setSub(false);go();};
+  const prog=step===0?0:Math.min((step/7)*100,100);
+
+  return(
+    <div style={{minHeight:'100vh',background:'#ede4d4',position:'relative',overflow:'hidden'}}>
+      <div style={{position:'fixed',top:-200,right:-200,width:600,height:600,borderRadius:'50%',background:'radial-gradient(circle,#c9a96e18 0%,transparent 70%)',pointerEvents:'none'}}/>
+      <div style={{position:'fixed',bottom:-300,left:-200,width:700,height:700,borderRadius:'50%',background:'radial-gradient(circle,#7b68ee10 0%,transparent 70%)',pointerEvents:'none'}}/>
+
+      <header style={{display:'flex',justifyContent:'space-between',alignItems:'center',padding:'14px 28px',zIndex:10,position:'relative'}}>
+        <img src={LOGO} alt="Med Clinic Authority" style={{height:52,objectFit:'contain'}}/>
+        {step>0&&step<8&&<span style={{fontSize:11,color:'#8888aa',fontWeight:600,letterSpacing:1,textTransform:'uppercase'}}>Step {step} of 7</span>}
+      </header>
+
+      {step>0&&step<8&&<div style={{height:2,background:'#ede9e1',zIndex:10,position:'relative'}}><div style={{height:'100%',background:'linear-gradient(90deg,#c9a96e,#e8c99e)',width:`${prog}%`,transition:'width .5s cubic-bezier(.4,0,.2,1)'}}/></div>}
+
+      <div style={{display:'flex',justifyContent:'center',padding:'24px 20px 80px',position:'relative',zIndex:10}}>
+        <div className="card fade" key={step} style={{background:'#fff',borderRadius:20,padding:'36px 40px',maxWidth:580,width:'100%',boxShadow:'0 4px 40px rgba(0,0,0,.06)'}}>
+
+          {step===0&&<div style={{textAlign:'center'}}>
+            <div style={{fontSize:34,color:'#c9a96e',marginBottom:12}}>✦</div>
+            <h1 style={{fontFamily:"'Cormorant Garamond',serif",fontSize:32,fontWeight:400,color:'#1a1a2e',lineHeight:1.2,marginBottom:12}}>Welcome to Your<br/><em>Growth Journey</em></h1>
+            <p style={{fontSize:14,color:'#666680',lineHeight:1.7,marginBottom:24,maxWidth:400,margin:'0 auto 24px'}}>This intake takes under 5 minutes and gives us everything we need to build your brand and marketing strategy.</p>
+            <div style={{fontSize:11,color:'#8888aa',marginBottom:10,fontWeight:600,letterSpacing:.5,textTransform:'uppercase'}}>Select your practice type</div>
+            <div className="g2" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:12,marginBottom:24,maxWidth:380,margin:'0 auto 24px'}}>
+              <button className={`typecard ${form.type==='med-spa'?'on':''}`} onClick={()=>set('type','med-spa')}>
+                <div style={{fontSize:26,marginBottom:6}}>💆</div>
+                <div style={{fontWeight:600,color:'#1a1a2e',fontSize:14,marginBottom:3}}>Med Spa</div>
+                <div style={{fontSize:11,color:'#8888aa'}}>Aesthetic & wellness</div>
+              </button>
+              <button className={`typecard ${form.type==='online-clinic'?'on':''}`} onClick={()=>set('type','online-clinic')}>
+                <div style={{fontSize:26,marginBottom:6}}>🏥</div>
+                <div style={{fontWeight:600,color:'#1a1a2e',fontSize:14,marginBottom:3}}>Online Clinic</div>
+                <div style={{fontSize:11,color:'#8888aa'}}>Virtual / telehealth</div>
+              </button>
+            </div>
+            <button className="btn-gold" style={{width:'100%',maxWidth:300}} onClick={go}>Begin Onboarding →</button>
+            <p style={{fontSize:11,color:'#aaa8bb',marginTop:12}}>100% secure & confidential</p>
+          </div>}
+
+          {step===1&&<div>
+            <SH icon="◈" title="Business Information" sub={isCl?"Tell us about your online clinic":"Tell us about your med spa"}/>
+            <div className="g2" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+              <F label="Business Name *" value={form.bizName} onChange={v=>set('bizName',v)} placeholder={isCl?"Radiant Health Clinic":"Glow Med Spa"}/>
+              <F label="Business Partner Name" value={form.partner} onChange={v=>set('partner',v)} placeholder="Partner (if applicable)"/>
+            </div>
+            <div style={{marginBottom:16}}>
+              <LBL t="Is your business registered / incorporated? *"/>
+              <Opts items={['Yes — LLC','Yes — S-Corp / C-Corp','Sole Proprietor','Not yet']} val={form.registered} set={v=>set('registered',v)}/>
+            </div>
+            <div className="g2" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+              <F label="State *" value={form.state} onChange={v=>set('state',v)} placeholder="FL"/>
+              <F label="City *" value={form.city} onChange={v=>set('city',v)} placeholder="Miami"/>
+            </div>
+            {!isCl&&<><F label="Street Address" value={form.address} onChange={v=>set('address',v)} placeholder="123 Beauty Blvd, Suite 200"/><F label="Business Hours" value={form.hours} onChange={v=>set('hours',v)} placeholder="Mon–Fri 9am–6pm, Sat 10am–4pm"/></>}
+            <Nav onNext={go} onPrev={back} canNext={form.bizName&&form.state&&form.city&&form.registered}/>
+          </div>}
+
+          {step===2&&<div>
+            <SH icon="◉" title="Contact Details" sub="Who's the main point of contact?"/>
+            <div className="g2" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+              <F label="First Name *" value={form.first} onChange={v=>set('first',v)} placeholder="Sarah"/>
+              <F label="Last Name *" value={form.last} onChange={v=>set('last',v)} placeholder="Johnson"/>
+            </div>
+            <F label="Email Address *" type="email" value={form.email} onChange={v=>set('email',v)} placeholder="sarah@yourpractice.com"/>
+            <F label="Phone Number *" type="tel" value={form.phone} onChange={v=>set('phone',v)} placeholder="+1 (305) 555-0100"/>
+            <F label="Current Website (if any)" value={form.website} onChange={v=>set('website',v)} placeholder="https://yoursite.com"/>
+            <div className="g2" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+              <F label="Instagram Handle" value={form.instagram} onChange={v=>set('instagram',v)} placeholder="@yourhandle"/>
+              <F label="Facebook Page" value={form.facebook} onChange={v=>set('facebook',v)} placeholder="facebook.com/yourpage"/>
+            </div>
+            <Nav onNext={go} onPrev={back} canNext={form.first&&form.last&&form.email&&form.phone}/>
+          </div>}
+
+          {step===3&&<div>
+            <SH icon="◇" title={isCl?"Clinic Services":"Spa Services"} sub={isCl?"What services does your online clinic offer?":"What treatments do you offer?"}/>
+            <div style={{marginBottom:20}}>
+              <LBL t="Services Offered *"/>
+              <Chips items={isCl?CLINIC_SVCS:SPA_SVCS} val={form.services} tog={v=>tog('services',v)}/>
+            </div>
+            {isCl&&<>
+              <div style={{marginBottom:20}}>
+                <LBL t="States You're Licensed to Practice In *"/>
+                <div style={{display:'flex',flexWrap:'wrap',gap:6}}>
+                  {US_STATES.map(s=><button key={s} className={`chip ${form.licensedStates.includes(s)?'on':''}`} style={{padding:'5px 9px',fontSize:11}} onClick={()=>tog('licensedStates',s)}>{s}</button>)}
+                </div>
+              </div>
+              <div style={{marginBottom:16}}>
+                <LBL t="Payment Model"/>
+                <Opts items={['Cash Pay Only','Insurance + Cash Pay','Subscription / Membership','Insurance Only']} val={form.payModel} set={v=>set('payModel',v)}/>
+              </div>
+              <F label="Telehealth Platform (if any)" value={form.platform} onChange={v=>set('platform',v)} placeholder="e.g. Doxy.me, Spruce, Simple Practice, Zoom"/>
+            </>}
+            <Nav onNext={go} onPrev={back} canNext={form.services.length>0}/>
+          </div>}
+
+          {step===4&&<div>
+            <SH icon="✦" title="Brand Vision" sub="Help us understand the look and feel you want"/>
+            <div style={{marginBottom:18}}>
+              <LBL t="Favorite Color Palette(s) *"/>
+              <Chips items={COLORS_LIST} val={form.colors} tog={v=>tog('colors',v)}/>
+            </div>
+            {form.colors.includes('Custom (describe below)')&&<F label="Describe your custom colors" value={form.colorCustom} onChange={v=>set('colorCustom',v)} placeholder="e.g. Deep forest green with warm gold accents"/>}
+            <div style={{marginBottom:18}}>
+              <LBL t="Font Style Preference"/>
+              <Chips items={FONTS_LIST} val={form.fonts} tog={v=>tog('fonts',v)}/>
+            </div>
+            <F label="Tagline / Slogan (optional)" value={form.tagline} onChange={v=>set('tagline',v)} placeholder="e.g. 'Look Good. Feel Amazing.' — leave blank if none"/>
+            <TA label="Logo Ideas or Visual Inspiration" value={form.logoIdeas} onChange={v=>set('logoIdeas',v)} placeholder="Describe what you'd like — shapes, icons, reference brands..."/>
+            <TA label="What message / emotion should your brand convey?" value={form.brandEmotion} onChange={v=>set('brandEmotion',v)} placeholder="e.g. Trustworthy, luxurious, approachable, clinical yet warm..."/>
+            <Nav onNext={go} onPrev={back} canNext={form.colors.length>0}/>
+          </div>}
+
+          {step===5&&<div>
+            <SH icon="◈" title="Marketing & Goals" sub="Help us understand where you're starting from"/>
+            <div style={{marginBottom:20}}>
+              <LBL t="Current Monthly Ad Spend *"/>
+              <Opts items={AD_SPEND} val={form.adSpend} set={v=>set('adSpend',v)}/>
+            </div>
+            <F label="Current Marketing Agency (if any)" value={form.currentAgency} onChange={v=>set('currentAgency',v)} placeholder="None / or agency name"/>
+            <TA label="Who are your target clients / patients? *" value={form.targetCustomers} onChange={v=>set('targetCustomers',v)} placeholder="e.g. Women 30–55 in South Florida seeking weight loss & anti-aging solutions"/>
+            <TA label="Short & long term business goals *" value={form.goals} onChange={v=>set('goals',v)} placeholder="Short: e.g. 20 new patients/month&#10;Long: e.g. expand to 5 states, reach $2M revenue"/>
+            <Nav onNext={go} onPrev={back} canNext={form.adSpend&&form.goals&&form.targetCustomers}/>
+          </div>}
+
+          {step===6&&<div>
+            <SH icon="◈" title="Business Setup" sub="Final details to get your account ready"/>
+            <div style={{background:'#fdf6ec',border:'1px solid #f0d9b5',borderRadius:10,padding:'13px 15px',marginBottom:20,fontSize:13,color:'#7a5c2e',lineHeight:1.6}}>
+              ⚠️ Our team will request your <strong>Certificate of Incorporation</strong> via secure email after your strategy call. Bank details below are for billing setup only.
+            </div>
+            <div className="g2" style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:14}}>
+              <F label="Bank Routing Number" value={form.routing} onChange={v=>set('routing',v)} placeholder="021000021"/>
+              <F label="Bank Account Number" type="password" value={form.account} onChange={v=>set('account',v)} placeholder="Account number"/>
+            </div>
+            <TA label="Anything else we should know?" value={form.notes} onChange={v=>set('notes',v)} placeholder="Special requests, questions, important context..."/>
+            <div style={{marginTop:16,display:'flex',flexDirection:'column',gap:10}}>
+              <label style={{display:'flex',gap:10,alignItems:'flex-start',cursor:'pointer'}}>
+                <input type="checkbox" checked={form.smsConsent} onChange={e=>set('smsConsent',e.target.checked)} style={{marginTop:3,accentColor:'#c9a96e'}}/>
+                <span style={{fontSize:12,color:'#8888aa',lineHeight:1.5}}>I consent to receive non-marketing text messages from <strong>Med Clinic Authority</strong> about my account & services. Msg & data rates may apply. Reply STOP to opt out.</span>
+              </label>
+              <label style={{display:'flex',gap:10,alignItems:'flex-start',cursor:'pointer'}}>
+                <input type="checkbox" checked={form.mktConsent} onChange={e=>set('mktConsent',e.target.checked)} style={{marginTop:3,accentColor:'#c9a96e'}}/>
+                <span style={{fontSize:12,color:'#8888aa',lineHeight:1.5}}>I consent to receive marketing & promotional messages from <strong>Med Clinic Authority</strong>.</span>
+              </label>
+            </div>
+            <Nav onNext={go} onPrev={back} canNext={form.smsConsent}/>
+          </div>}
+
+          {step===7&&<div>
+            <SH icon="◉" title="Schedule Your Strategy Call" sub="Pick a time — we'll come prepared with your custom growth plan"/>
+            <div style={{fontSize:13,color:'#666680',lineHeight:1.6,marginBottom:20,padding:'12px 14px',background:'#fdf6ec',borderRadius:8,borderLeft:'3px solid #c9a96e'}}>
+              Your dedicated strategist will review everything and arrive with a custom roadmap for your {isCl?'online clinic':'med spa'}.
+            </div>
+            <div style={{marginBottom:20}}>
+              <LBL t="Preferred Time Slot *"/>
+              <div className="g3" style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:8}}>
+                {TIMES.map(t=><button key={t} className={`timebtn ${form.callTime===t?'on':''}`} onClick={()=>set('callTime',t)}>{t}</button>)}
+              </div>
+            </div>
+            <button className="btn-gold" style={{width:'100%'}} disabled={!form.callTime||sub} onClick={submit}>
+              {sub?'Submitting...':'Complete Onboarding ✦'}
+            </button>
+            <button className="btn-ghost" style={{width:'100%',marginTop:10}} onClick={back}>← Back</button>
+          </div>}
+
+          {step===8&&<div style={{textAlign:'center'}}>
+            <div className="pop" style={{fontSize:44,color:'#c9a96e',marginBottom:12}}>✦</div>
+            <h1 style={{fontFamily:"'Cormorant Garamond',serif",fontSize:30,fontWeight:400,color:'#1a1a2e',lineHeight:1.2,marginBottom:12}}>You're All Set,<br/><em>{form.first||'Friend'}!</em></h1>
+            <p style={{fontSize:14,color:'#666680',lineHeight:1.7,marginBottom:20}}>Your onboarding is complete. Check your inbox — our team will reach out within 24 hours to confirm your strategy call.</p>
+            <div style={{background:'#ede4d4',borderRadius:12,padding:'4px 20px',textAlign:'left',marginBottom:18}}>
+              {[['Practice',form.bizName],['Type',isCl?'Online Clinic':'Med Spa'],['Contact',`${form.first} ${form.last}`],['Email',form.email],['Strategy Call',form.callTime]].filter(([,v])=>v?.trim()).map(([k,v])=>(
+                <div key={k} style={{display:'flex',justifyContent:'space-between',padding:'9px 0',borderBottom:'1px solid #f0ece6'}}>
+                  <span style={{fontSize:13,color:'#8888aa'}}>{k}</span>
+                  <span style={{fontSize:13,color:'#1a1a2e',fontWeight:500,textAlign:'right',maxWidth:'60%'}}>{v}</span>
+                </div>
+              ))}
+            </div>
+            <p style={{fontSize:12,color:'#aaa8bb'}}>Questions? Email <strong>hello@medclinicauthority.com</strong></p>
+          </div>}
+
+        </div>
+      </div>
+    </div>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
