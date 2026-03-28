@@ -68,7 +68,7 @@ const ClinicIcon=({active})=>(
 );
 
 const SPA=["Botox / Neurotoxins","Dermal Fillers","Laser Treatments","Body Contouring","IV Therapy","Skin Care / Facials","Weight Loss Programs","PRP Treatments","Microneedling","Chemical Peels","Hormone Therapy","Other"];
-const CLINIC=["Weight Loss / GLP-1 (Ozempic, Semaglutide)","Hormone Replacement (HRT)","Hair Loss Treatment","Supplement Programs","Lab Testing / Blood Work","Meal Plans Shipped to Clients","Men's Health","Women's Health","Anti-Aging / Longevity","Mental Health / Therapy","Primary / Urgent Care","Other"];
+const CLINIC=["Weight Loss / GLP-1 (Ozempic, Semaglutide)","Hormone Replacement (HRT)","Hair Loss Treatment","Supplement Programs","Lab Testing / Blood Work","Meal Plans Shipped to Clients","Men\u0027s Health","Women\u0027s Health","Anti-Aging / Longevity","Mental Health / Therapy","Primary / Urgent Care","Other"];
 const SPEND=["Not currently running ads","$500 – $1,500 / mo","$1,500 – $3,000 / mo","$3,000 – $5,000 / mo","$5,000 – $10,000 / mo","$10,000+ / mo"];
 const CLRS=["White & Gold","Black & Gold","Navy & White","Rose Gold & Cream","Sage Green & White","Blush Pink & Nude","Deep Burgundy & Ivory","Teal & Silver","Custom (describe below)"];
 const FNTS=["Clean & Modern","Elegant & Serif","Script / Handwritten","Bold & Strong","Minimalist","Luxury / High-end","Let you decide"];
@@ -294,8 +294,7 @@ function App(){
               <div style={{marginBottom:22}}><L t="Current Monthly Ad Spend *"/><Opts items={SPEND} val={f.spend} set={function(v){set("spend",v);}}/></div>
               <Field label="Current Marketing Agency (if any)" value={f.agency} onChange={function(v){set("agency",v);}} placeholder="None / Agency name"/>
               <TArea label="Who are your target clients / patients? *" value={f.target} onChange={function(v){set("target",v);}} placeholder="e.g. Women 30-55 in South Florida seeking weight loss and anti-aging solutions"/>
-              <TArea label="Short and long term business goals *" value={f.goals} onChange={function(v){set("goals",v);}} placeholder={"Short: 20 new patients per month
-Long: expand to 5 states, $2M annual revenue"}/>
+              <TArea label="Short and long term business goals *" value={f.goals} onChange={function(v){set("goals",v);}} placeholder="Short term: 20 new patients/month. Long term: expand to 5 states, $2M revenue"/>
               <Nav onNext={go} onPrev={back} ok={f.spend&&f.goals&&f.target}/>
             </div>
           )}
